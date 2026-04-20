@@ -15,7 +15,7 @@ CORS(app, supports_credentials=True, origins=[
     "http://127.0.0.1:3000", "http://127.0.0.1:8080",
     "http://localhost:5500", "http://127.0.0.1:5500",
     "https://ai-online-banking-system.onrender.com",
-    "https://*.netlify.app"
+    "https://aibankingsystem.netlify.app"
 ])
 
 app.register_blueprint(auth_bp)
