@@ -50,6 +50,9 @@ def security_headers(response):
 @app.errorhandler(404)
 def not_found(e): return jsonify({"error": "Not found"}), 404
 
+@app.route("/api/health")
+def health(): return jsonify({"status": "ok"}), 200
+
 @app.errorhandler(429)
 def too_many(e): return jsonify({"error": "Too many requests"}), 429
 

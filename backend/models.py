@@ -25,8 +25,8 @@ def sanitize(val, max_len=100):
     return str(val).strip()[:max_len] if val else ""
 
 def validate_username(u):
-    if not re.match(r"^[a-zA-Z0-9_]{3,30}$", u):
-        return "Username: 3-30 chars, letters/numbers/underscore only"
+    if not re.match(r"^[a-zA-Z0-9_\.@]{3,50}$", u):
+        return "Username: 3-50 chars, letters/numbers/underscore/dot/@ only"
 
 def validate_password(p):
     if len(p) < 8: return "Password must be at least 8 characters"
