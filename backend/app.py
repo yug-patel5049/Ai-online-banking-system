@@ -8,16 +8,21 @@ import time
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
-app.config["MAX_CONTENT_LENGTH"] = 16 * 1024  # 16KB max body
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024
 
 CORS(app, supports_credentials=True, origins=[
     "http://localhost:3000", "http://localhost:8080",
     "http://127.0.0.1:3000", "http://127.0.0.1:8080",
-    "http://localhost:5500", "http://127.0.0.1:5500"
+    "http://localhost:5500", "http://127.0.0.1:5500",
+    "https://ai-online-banking-system.onrender.com",
+    "https://*.netlify.app"
 ])
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(api_bp)
+
+# Initialize DB on startup (works with both gunicorn and python app.py)
+init_db()
 
 # ── Rate limiting ─────────────────────────────────────────────────────────────
 _req_log = {}
@@ -51,9 +56,7 @@ def too_many(e): return jsonify({"error": "Too many requests"}), 429
 @app.errorhandler(500)
 def server_error(e): return jsonify({"error": "Internal server error"}), 500
 
-# ── Start ─────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    init_db()
     print("✅ Database initialized")
     print("🚀 AI Bank running at http://127.0.0.1:5000")
     app.run(debug=config.DEBUG, port=5000)
