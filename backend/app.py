@@ -15,6 +15,7 @@ CORS(app, supports_credentials=True, origins=[
     "http://127.0.0.1:3000", "http://127.0.0.1:8080",
     "http://localhost:5500", "http://127.0.0.1:5500",
     "https://ai-online-banking-system.onrender.com",
+    "https://ai-online-banking-system-1.onrender.com",
     "https://aibankingsystem.netlify.app"
 ])
 
