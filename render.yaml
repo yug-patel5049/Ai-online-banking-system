@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: aibank-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_PATH
+        value: bank.db
+      - key: DEBUG
+        value: "False"

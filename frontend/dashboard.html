@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AI Bank — Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div class="app">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sb-logo"><h2>🏦 AI Bank</h2><span>Smart Banking</span></div>
+  <nav class="sb-nav">
+    <button class="nav-btn active" data-page="dashboard"><span class="ic">📊</span><span>Dashboard</span></button>
+    <button class="nav-btn" data-page="accounts"><span class="ic">💳</span><span>Accounts</span></button>
+    <button class="nav-btn" data-page="transfer"><span class="ic">↔️</span><span>Transfer</span></button>
+    <button class="nav-btn" data-page="history"><span class="ic">📋</span><span>History</span></button>
+    <button class="nav-btn" data-page="ai"><span class="ic">🤖</span><span>AI Advisor</span></button>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="avatar" id="av">U</div>
+      <div><div class="sb-name" id="sbName">User</div><div class="sb-role">Account Holder</div></div>
+    </div>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- Dashboard -->
+  <div id="page-dashboard" class="page active">
+    <div class="topbar">
+      <h1>Dashboard</h1>
+      <div class="topbar-btns">
+        <button class="btn btn-success btn-sm" onclick="openModal('mDeposit')">+ Deposit</button>
+        <button class="btn btn-danger btn-sm" onclick="openModal('mWithdraw')">Withdraw</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat blue"><div class="lbl">Total Balance</div><div class="val" id="sTotalBal">₹0</div><div class="sub">All accounts</div></div>
+      <div class="stat green"><div class="lbl">Total Credits</div><div class="val" id="sTotalCr">₹0</div><div class="sub">Money in</div></div>
+      <div class="stat red"><div class="lbl">Total Debits</div><div class="val" id="sTotalDb">₹0</div><div class="sub">Money out</div></div>
+      <div class="stat"><div class="lbl">Accounts</div><div class="val" id="sAccCount">0</div><div class="sub">Active</div></div>
+    </div>
+    <div class="section">
+      <div class="sec-title">📋 Recent Transactions</div>
+      <ul class="txn-list" id="recentTxns"><li class="empty">Loading...</li></ul>
+    </div>
+  </div>
+
+  <!-- Accounts -->
+  <div id="page-accounts" class="page">
+    <div class="topbar"><h1>My Accounts</h1>
+      <button class="btn btn-primary btn-sm" onclick="openModal('mNewAcc')">+ Open Account</button>
+    </div>
+    <div id="accList"></div>
+  </div>
+
+  <!-- Transfer -->
+  <div id="page-transfer" class="page">
+    <div class="topbar"><h1>Transfer Money</h1></div>
+    <div class="section" style="max-width:480px">
+      <div class="sec-title">↔️ Fund Transfer</div>
+      <div id="tErr" class="alert alert-err"></div>
+      <div id="tOk" class="alert alert-ok"></div>
+      <div class="field"><label>From Account</label><select id="tFrom"></select></div>
+      <div class="field"><label>To Account Number</label>
+        <input id="tTo" type="text" placeholder="10-digit account number"/>
+      </div>
+      <div class="field"><label>Amount (₹)</label>
+        <input id="tAmt" type="number" placeholder="0.00" min="1"/>
+      </div>
+      <button class="btn btn-primary" onclick="doTransfer()">Transfer Now</button>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div id="page-history" class="page">
+    <div class="topbar"><h1>Transaction History</h1></div>
+    <div class="section">
+      <div class="field" style="max-width:320px">
+        <label>Select Account</label>
+        <select id="hAccSel" onchange="loadHistory()"></select>
+      </div>
+      <ul class="txn-list" id="histTxns"><li class="empty">Select an account above.</li></ul>
+    </div>
+  </div>
+
+  <!-- AI Advisor -->
+  <div id="page-ai" class="page">
+    <div class="topbar"><h1>🤖 AI Financial Advisor</h1></div>
+    <div class="grid2">
+      <div class="section">
+        <div class="sec-title">📈 Spending Insights</div>
+        <div class="field"><select id="aiAccSel" onchange="loadInsights()"></select></div>
+        <div id="aiOut"><p class="empty">Select an account to load insights.</p></div>
+      </div>
+      <div class="section">
+        <div class="sec-title">💬 Chat with AI</div>
+        <div class="chat-wrap">
+          <div class="chat-msgs" id="chatMsgs">
+            <div class="msg bot"><div class="bubble">Hi! I'm your AI banking assistant. Ask me about your balance, spending, savings, or fraud protection.</div></div>
+          </div>
+          <div class="chat-row">
+            <input id="chatIn" type="text" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendChat()"/>
+            <button class="btn btn-primary btn-sm" onclick="sendChat()">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- Deposit Modal -->
+<div class="overlay" id="mDeposit">
+  <div class="modal">
+    <h3>💰 Deposit Money</h3>
+    <div id="dErr" class="alert alert-err"></div>
+    <div class="field"><label>Account</label><select id="dAcc"></select></div>
+    <div class="field"><label>Amount (₹)</label><input id="dAmt" type="number" placeholder="0.00" min="1"/></div>
+    <div class="field"><label>Description</label><input id="dDesc" type="text" placeholder="e.g. Salary"/></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('mDeposit')">Cancel</button>
+      <button class="btn btn-success btn-sm" onclick="doDeposit()">Deposit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div class="overlay" id="mWithdraw">
+  <div class="modal">
+    <h3>💸 Withdraw Money</h3>
+    <div id="wErr" class="alert alert-err"></div>
+    <div class="field"><label>Account</label><select id="wAcc"></select></div>
+    <div class="field"><label>Amount (₹)</label><input id="wAmt" type="number" placeholder="0.00" min="1"/></div>
+    <div class="field"><label>Description</label><input id="wDesc" type="text" placeholder="e.g. Groceries"/></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('mWithdraw')">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="doWithdraw()">Withdraw</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Account Modal -->
+<div class="overlay" id="mNewAcc">
+  <div class="modal">
+    <h3>🏦 Open New Account</h3>
+    <div class="field"><label>Account Type</label>
+      <select id="newAccType">
+        <option value="Savings">Savings Account</option>
+        <option value="Current">Current Account</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('mNewAcc')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="doNewAccount()">Open Account</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

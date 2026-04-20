@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AI Bank — Login</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <h1>🏦 AI Bank</h1>
+      <p>Secure · Smart · Simple</p>
+    </div>
+    <div id="err" class="alert alert-err"></div>
+    <form id="form">
+      <div class="field"><label>Username</label>
+        <input id="u" type="text" placeholder="Enter your username" required autocomplete="username"/>
+      </div>
+      <div class="field"><label>Password</label>
+        <input id="p" type="password" placeholder="Enter your password" required autocomplete="current-password"/>
+      </div>
+      <button class="btn btn-primary" type="submit">Sign In</button>
+    </form>
+    <div class="auth-link">No account? <a href="register.html">Create one free</a></div>
+  </div>
+</div>
+<script>
+const API = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+  ? "http://127.0.0.1:5000"
+  : "https://YOUR-APP-NAME.onrender.com";
+document.getElementById("form").onsubmit = async e => {
+  e.preventDefault();
+  const err = document.getElementById("err");
+  const btn = e.target.querySelector("button");
+  err.style.display = "none";
+  btn.textContent = "Signing in...";
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API}/api/login`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({username: document.getElementById("u").value,
+                            password: document.getElementById("p").value})
+    });
+    const d = await res.json();
+    if (res.ok) {
+      localStorage.clear();
+      localStorage.setItem("token", d.token);
+      localStorage.setItem("name", d.name);
+      localStorage.setItem("username", d.username);
+      btn.textContent = "Redirecting...";
+      setTimeout(() => { location.href = "dashboard.html"; }, 100);
+    } else {
+      err.textContent = d.error;
+      err.style.display = "block";
+      btn.textContent = "Sign In";
+      btn.disabled = false;
+    }
+  } catch(e) {
+    err.textContent = "Cannot connect to server. Make sure the backend is running.";
+    err.style.display = "block";
+    btn.textContent = "Sign In";
+    btn.disabled = false;
+  }
+};
+</script>
+</body>
+</html>
